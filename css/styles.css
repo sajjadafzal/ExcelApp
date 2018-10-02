@@ -1,0 +1,13 @@
+.col {
+  /* border: 1px solid blue; */
+  height: 90vh;
+  margin: 1px;
+  box-shadow: 0 0 5px black;
+}
+.right {
+  /* border: 1px solid red; */
+}
+
+button {
+  margin: 10px;
+}
