@@ -19,4 +19,13 @@ button {
 td {
   padding: 2.5px;
   border: 1px solid black;
+  min-width: 35px;
+  text-align: center;
+}
+th {
+  padding: 2.5px;
+  border: 1px solid black;
+  font-weight: bold;
+  min-width: 35px;
+  text-align: center;
 }

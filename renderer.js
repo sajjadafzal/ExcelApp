@@ -31,7 +31,7 @@ var workbook = Excel.readFile('DataFile.xls');
 const datajs = Excel.utils.sheet_to_json(
   workbook.Sheets[workbook.SheetNames[0]]
 );
-
+//console.log(datajs);
 displayJSON(datajs);
 
 // var tbl = document.createElement('');
@@ -40,8 +40,19 @@ function displayJSON(jsonData) {
   tabdiv.innerHTML = '';
 
   var tbl = document.createElement('table');
-  Object.keys(datajs
-  //datajs.forEach(row => {
+
+  var tr = document.createElement('tr'); //Header row
+
+  Object.keys(jsonData[0]).forEach(hdr => {
+    var th = document.createElement('th');
+    th.innerHTML = hdr;
+    //console.log(c1);
+    tr.append(th);
+  });
+  tbl.append(tr);
+
+  // Getting data values
+  jsonData.forEach(row => {
     var rw = document.createElement('tr');
     Object.values(row).forEach(ent => {
       var cl = document.createElement('td');
