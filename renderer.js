@@ -7,6 +7,9 @@ const { app, dialog } = remote;
 //var basepath = app.getAppPath();
 //document.getElementById('folderpath').innerHTML = basepath;
 
+var dataDiv = document.getElementById('DataSpace');
+var keyDiv = document.getElementById('KeySpace');
+
 document.getElementById('browseFile').onclick = () => {
   //console.log(dialog);
   dialog.showOpenDialog(
@@ -31,14 +34,17 @@ var workbook = Excel.readFile('DataFile.xls');
 const datajs = Excel.utils.sheet_to_json(
   workbook.Sheets[workbook.SheetNames[0]]
 );
+workbook = Excel.readFile('KEY.xls');
+
+const keyjs = Excel.utils.sheet_to_json(
+  workbook.Sheets[workbook.SheetNames[0]]
+);
 //console.log(datajs);
-displayJSON(datajs);
+displayJSON(datajs, 'Data');
+displayJSON(keyjs, 'Key');
 
 // var tbl = document.createElement('');
-function displayJSON(jsonData) {
-  var tabdiv = document.getElementById('DataSpace');
-  tabdiv.innerHTML = '';
-
+function displayJSON(jsonData, displayDiv) {
   var tbl = document.createElement('table');
 
   var tr = document.createElement('tr'); //Header row
@@ -49,6 +55,7 @@ function displayJSON(jsonData) {
     //console.log(c1);
     tr.append(th);
   });
+
   tbl.append(tr);
 
   // Getting data values
@@ -61,5 +68,18 @@ function displayJSON(jsonData) {
     });
     tbl.append(rw);
   });
-  tabdiv.append(tbl);
+  if (displayDiv == 'Data') dataDiv.append(tbl);
+  else keyDiv.append(tbl);
 }
+
+document.getElementsByName('toggleView').forEach(t => {
+  t.onclick = function(event) {
+    if (event.target.value == 'key') {
+      dataDiv.style.display = 'none';
+      keyDiv.style.display = 'block';
+    } else {
+      dataDiv.style.display = 'block';
+      keyDiv.style.display = 'none';
+    }
+  };
+});
