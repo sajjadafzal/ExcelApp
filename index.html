@@ -1,31 +1,34 @@
 <!DOCTYPE html>
 <html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <!-- <link rel="stylesheet" href="css/bootstrap.css"> -->
+    <link rel="stylesheet" href="css/styles.css?v=1.0" />
+    <title>Hello World!</title>
+  </head>
 
-<head>
-  <meta charset="UTF-8">
-  <!-- <link rel="stylesheet" href="css/bootstrap.css"> -->
-  <link rel="stylesheet" href="css/styles.css?v=1.0">
-  <title>Hello World!</title>
+  <body>
+    <button id="browseFile" type="button" class="">Primary</button> Data:
+    <input
+      type="radio"
+      id="toggleView"
+      name="toggleView"
+      value="Data"
+      checked
+    />
+    Key:
+    <input type="radio" id="toggleView" name="toggleView" value="key" /> Result:
+    <input type="radio" id="toggleView" name="toggleView" value="result" />
+    <button id="btn_Result" type="button" class="">Calculate Result</button>
+    <div id="DataSpace" class=""></div>
+    <div id="KeySpace" class="" style="display: none"></div>
+    <div id="ResultSpace" class="" style="display: none"></div>
 
-</head>
+    <!-- <script src="js/bootstrap.bundle.js"></script> -->
 
-<body>
-
-  <button id="browseFile" type="button" class="">Primary</button>
-  Data:
-  <input type="radio" id="toggleView" name="toggleView" value="Data" checked>
-  Key:
-  <input type="radio" id="toggleView" name="toggleView" value="key">
-  <div id="DataSpace" class=""></div>
-  <div id="KeySpace" class=""></div>
-
-  <!-- <script src="js/bootstrap.bundle.js"></script> -->
-
-  <script>
-    // You can also require other files to run in this process
-    require('./renderer.js')
-  </script>
-
-</body>
-
+    <script>
+      // You can also require other files to run in this process
+      require('./renderer.js');
+    </script>
+  </body>
 </html>

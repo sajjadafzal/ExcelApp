@@ -9,7 +9,8 @@ const { app, dialog } = remote;
 
 var dataDiv = document.getElementById('DataSpace');
 var keyDiv = document.getElementById('KeySpace');
-
+var resultDiv = document.getElementById('ResultSpace');
+var resultjs = [];
 document.getElementById('browseFile').onclick = () => {
   //console.log(dialog);
   dialog.showOpenDialog(
@@ -39,9 +40,9 @@ workbook = Excel.readFile('KEY.xls');
 const keyjs = Excel.utils.sheet_to_json(
   workbook.Sheets[workbook.SheetNames[0]]
 );
-//console.log(datajs);
-displayJSON(datajs, 'Data');
-displayJSON(keyjs, 'Key');
+console.log(datajs);
+displayJSON(datajs, dataDiv);
+displayJSON(keyjs, keyDiv);
 
 // var tbl = document.createElement('');
 function displayJSON(jsonData, displayDiv) {
@@ -68,8 +69,7 @@ function displayJSON(jsonData, displayDiv) {
     });
     tbl.append(rw);
   });
-  if (displayDiv == 'Data') dataDiv.append(tbl);
-  else keyDiv.append(tbl);
+  displayDiv.append(tbl);
 }
 
 document.getElementsByName('toggleView').forEach(t => {
@@ -77,9 +77,40 @@ document.getElementsByName('toggleView').forEach(t => {
     if (event.target.value == 'key') {
       dataDiv.style.display = 'none';
       keyDiv.style.display = 'block';
-    } else {
+      resultDiv.style.display = 'none';
+    } else if (event.target.value == 'Data') {
       dataDiv.style.display = 'block';
       keyDiv.style.display = 'none';
+      resultDiv.style.display = 'none';
+    } else {
+      dataDiv.style.display = 'none';
+      keyDiv.style.display = 'none';
+      resultDiv.style.display = 'block';
     }
   };
 });
+
+document.getElementById('btn_Result').onclick = () => {
+  datajs.forEach(row => {
+    var colNames = Object.keys(row);
+    var totalMarks = 0;
+
+    keyjs.forEach(keyRow => {
+      if (keyRow.POST == row.POST) {
+        colNames.forEach(colName => {
+          if (colName[0] == 'Q') {
+            if (row[colName] == keyRow[colName]) {
+              totalMarks += 3;
+            } else {
+              totalMarks -= 1;
+            }
+          }
+        });
+      }
+    });
+
+    resultjs.push({ RollNo: row.RollNo, TotalMarks: totalMarks });
+  });
+  console.log(resultjs);
+  displayJSON(resultjs, resultDiv);
+};
