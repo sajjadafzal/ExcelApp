@@ -12,6 +12,7 @@ var keyDiv = document.getElementById('KeySpace');
 var resultDiv = document.getElementById('ResultSpace');
 var resultjs = [];
 var newJSONData;
+var newKeyData;
 document.getElementById('browseFile').onclick = () => {
   //console.log(dialog);
   dialog.showOpenDialog(
@@ -43,12 +44,11 @@ const keyjs = Excel.utils.sheet_to_json(
 );
 console.log(datajs);
 //TESTING NEW JSON
-newJSONData = ReformatJSON(datajs);
-console.log(newJSONData);
-
+newJSONData = ReformatJSON(datajs, 4);
+newJSONKey = ReformatJSON(keyjs, 3);
 displayJSON(newJSONData, dataDiv);
 //displayJSON(datajs, dataDiv);
-displayJSON(keyjs, keyDiv);
+displayJSON(newJSONKey, keyDiv);
 
 // var tbl = document.createElement('');
 function displayJSON(jsonData, displayDiv) {
@@ -136,7 +136,7 @@ document.getElementById('btn_Export').onclick = () => {
   Excel.writeFile(wb, 'RESULT.xlsx');
 };
 
-function ReformatJSON(sourceJSON) {
+function ReformatJSON(sourceJSON, noOfColShifts) {
   // var dataText = '[ ';
   // var isFirst = true;
 
@@ -166,14 +166,12 @@ function ReformatJSON(sourceJSON) {
   // console.log(dataText);
   // return JSON.parse(dataText);
   var colNames = Object.keys(sourceJSON[0]);
-  rotate(colNames, 4);
+
+  // performs a circular shift on an array
+  while (noOfColShifts--) {
+    colNames.unshift(colNames.pop());
+  }
+
   dataText = JSON.stringify(sourceJSON, colNames);
   return JSON.parse(dataText);
-}
-
-// performs a circular shift on an array
-function rotate(array, times) {
-  while (times--) {
-    array.unshift(array.pop());
-  }
 }
