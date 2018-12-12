@@ -11,6 +11,7 @@ var dataDiv = document.getElementById('DataSpace');
 var keyDiv = document.getElementById('KeySpace');
 var resultDiv = document.getElementById('ResultSpace');
 var resultjs = [];
+var newJSONData;
 document.getElementById('browseFile').onclick = () => {
   //console.log(dialog);
   dialog.showOpenDialog(
@@ -41,7 +42,12 @@ const keyjs = Excel.utils.sheet_to_json(
   workbook.Sheets[workbook.SheetNames[0]]
 );
 console.log(datajs);
-displayJSON(datajs, dataDiv);
+//TESTING NEW JSON
+newJSONData = ReformatJSON(datajs);
+console.log(newJSONData);
+
+displayJSON(newJSONData, dataDiv);
+//displayJSON(datajs, dataDiv);
 displayJSON(keyjs, keyDiv);
 
 // var tbl = document.createElement('');
@@ -114,3 +120,60 @@ document.getElementById('btn_Result').onclick = () => {
   console.log(resultjs);
   displayJSON(resultjs, resultDiv);
 };
+
+document.getElementById('btn_Export').onclick = () => {
+  var wb = Excel.utils.book_new();
+  wb.Props = {
+    Title: 'RESULT',
+    Subject: 'Test',
+    Author: 'Sajjad Afzal',
+    Manager: 'Zaheen Muhammad',
+    CreatedDate: new Date(),
+  };
+  wb.SheetNames.push('RESULT');
+  var ws = Excel.utils.json_to_sheet(resultjs);
+  wb.Sheets['RESULT'] = ws;
+  Excel.writeFile(wb, 'RESULT.xlsx');
+};
+
+function ReformatJSON(sourceJSON) {
+  // var dataText = '[ ';
+  // var isFirst = true;
+
+  // sourceJSON.forEach(r => {
+  //   if (!isFirst) {
+  //     dataText = dataText + ',';
+  //   }
+  //   isFirst = false;
+  //   dataText = dataText + '{ "RollNo":';
+  //   dataText = dataText + r.RollNo;
+  //   dataText = dataText + ', "POST":';
+  //   dataText = dataText + r.POST;
+  //   dataText = dataText + ', "CENTER":';
+  //   dataText = dataText + r.CENTER;
+  //   dataText = dataText + ', "TIME":';
+  //   dataText = dataText + r.TIME;
+  //   var colNames = Object.keys(r);
+  //   colNames.forEach(colName => {
+  //     if ((colName[0] = 'Q')) {
+  //       dataText = dataText + ',"' + colName + '":';
+  //       dataText = dataText + '"' + r[colName] + '"';
+  //     }
+  //   });
+  //   dataText = dataText + '}';
+  // });
+  // dataText = dataText + ']';
+  // console.log(dataText);
+  // return JSON.parse(dataText);
+  var colNames = Object.keys(sourceJSON[0]);
+  rotate(colNames, 4);
+  dataText = JSON.stringify(sourceJSON, colNames);
+  return JSON.parse(dataText);
+}
+
+// performs a circular shift on an array
+function rotate(array, times) {
+  while (times--) {
+    array.unshift(array.pop());
+  }
+}
