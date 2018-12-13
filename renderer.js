@@ -59,6 +59,7 @@ function displayJSON(jsonData, displayDiv) {
   Object.keys(jsonData[0]).forEach(hdr => {
     var th = document.createElement('th');
     th.innerHTML = hdr;
+    //th.style = 'font-weight: bold; font-style: italic; font-size: 30px;';
     //console.log(c1);
     tr.append(th);
   });
@@ -131,7 +132,9 @@ document.getElementById('btn_Export').onclick = () => {
     CreatedDate: new Date(),
   };
   wb.SheetNames.push('RESULT');
+  // var ws = Excel.utils.json_to_sheet(resultjs, { skipHeader: true });
   var ws = Excel.utils.json_to_sheet(resultjs);
+  // var ws = Excel.utils.table_to_sheet(resultDiv);
   wb.Sheets['RESULT'] = ws;
   Excel.writeFile(wb, 'RESULT.xlsx');
 };
