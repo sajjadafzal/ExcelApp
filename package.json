@@ -21,11 +21,19 @@
   "license": "CC0-1.0",
   "devDependencies": {
     "electron": "2.0.10",
+    "eslint": "^5.10.0",
+    "eslint-config-standard": "^12.0.0",
+    "eslint-plugin-import": "^2.14.0",
+    "eslint-plugin-node": "^8.0.0",
+    "eslint-plugin-promise": "^4.0.1",
+    "eslint-plugin-standard": "^4.0.0",
     "xlsx": "^0.14.1"
   },
   "bugs": {
     "url": "https://github.com/electron/electron-quick-start/issues"
   },
   "homepage": "https://github.com/electron/electron-quick-start#readme",
-  "dependencies": {}
+  "dependencies": {
+    "electron-reload": "^1.4.0"
+  }
 }
