@@ -38,25 +38,40 @@ function prepareResult() {
   const datajs = ReformatJSON(readExcelToJSON('DataFile.xls'), 4);
   const keyjs = ReformatJSON(readExcelToJSON('KEY.xls'), 3);
 
+  var totalMarks = 0;
+
   datajs.forEach(row => {
     var colNames = Object.keys(row);
-    var totalMarks = 0;
+    var marksObtained = 0;
+
+    var correct = 0;
+    var inCorrect = 0;
+    var percentage = 0;
+    var nonAttempt = 0;
 
     keyjs.forEach(keyRow => {
       if (keyRow.POST === row.POST) {
         colNames.forEach(colName => {
-          if (colName[0] === 'Q') {
-            if (row[colName] === keyRow[colName]) {
-              totalMarks += 3;
-            } else {
-              totalMarks -= 1;
+          if (keyRow[colName] !== '*' || keyRow[colName] !== '?') {
+            if (colName[0] === 'Q') {
+              if (row[colName] === '?') {
+                nonAttempt++;
+              } else {
+                if (row[colName] === keyRow[colName]) {
+                  marksObtained += 3;
+                  correct++;
+                } else {
+                  marksObtained -= 1;
+                  inCorrect++;
+                }
+              }
             }
           }
         });
       }
     });
 
-    global.resultjs.push({ RollNo: row.RollNo, TotalMarks: totalMarks });
+    global.resultjs.push({ RollNo: row.RollNo, 'Total Marks Obtained': marksObtained, Correct: correct, 'In Correct': inCorrect, 'Un Attempted': nonAttempt });
   });
 
   // console.log(resultjs);
@@ -94,7 +109,7 @@ function displayJSON(jsonData, displayDiv) {
   var tbl = document.createElement('table');
   var tr = document.createElement('tr'); // Header row
 
-  tbl.className = 'table';
+  // tbl.className = 'table-bordered';
 
   Object.keys(jsonData[0]).forEach(hdr => {
     var th = document.createElement('th');
