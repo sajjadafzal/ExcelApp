@@ -1,32 +1,84 @@
-function ReformatJSON(sourceJSON, noOfColShifts) {
-  // var dataText = '[ ';
-  // var isFirst = true;
+const Excel = require('xlsx');
+const { remote } = require('electron');
 
-  // sourceJSON.forEach(r => {
-  //   if (!isFirst) {
-  //     dataText = dataText + ',';
-  //   }
-  //   isFirst = false;
-  //   dataText = dataText + '{ "RollNo":';
-  //   dataText = dataText + r.RollNo;
-  //   dataText = dataText + ', "POST":';
-  //   dataText = dataText + r.POST;
-  //   dataText = dataText + ', "CENTER":';
-  //   dataText = dataText + r.CENTER;
-  //   dataText = dataText + ', "TIME":';
-  //   dataText = dataText + r.TIME;
-  //   var colNames = Object.keys(r);
-  //   colNames.forEach(colName => {
-  //     if ((colName[0] = 'Q')) {
-  //       dataText = dataText + ',"' + colName + '":';
-  //       dataText = dataText + '"' + r[colName] + '"';
-  //     }
-  //   });
-  //   dataText = dataText + '}';
-  // });
-  // dataText = dataText + ']';
-  // console.log(dataText);
-  // return JSON.parse(dataText);
+const { dataDiv, keyDiv, resultDiv } = require('./uielements');
+const { dialog } = remote;
+
+function toggleView(event) {
+  const view = event.target.value;
+
+  if (view === 'key') {
+    dataDiv.style.display = 'none';
+    keyDiv.style.display = 'block';
+    resultDiv.style.display = 'none';
+  } else if (view === 'Data') {
+    dataDiv.style.display = 'block';
+    keyDiv.style.display = 'none';
+    resultDiv.style.display = 'none';
+  } else {
+    dataDiv.style.display = 'none';
+    keyDiv.style.display = 'none';
+    resultDiv.style.display = 'block';
+  }
+}
+
+function readExcelToJSON(path) {
+  var workbook = Excel.readFile(path);
+  const datajs = Excel.utils.sheet_to_json(
+    workbook.Sheets[workbook.SheetNames[0]]
+  );
+
+  return datajs;
+}
+
+function prepareResult() {
+  global.resultjs = [];
+
+  // read data file
+  const datajs = ReformatJSON(readExcelToJSON('DataFile.xls'), 4);
+  const keyjs = ReformatJSON(readExcelToJSON('KEY.xls'), 3);
+
+  datajs.forEach(row => {
+    var colNames = Object.keys(row);
+    var totalMarks = 0;
+
+    keyjs.forEach(keyRow => {
+      if (keyRow.POST === row.POST) {
+        colNames.forEach(colName => {
+          if (colName[0] === 'Q') {
+            if (row[colName] === keyRow[colName]) {
+              totalMarks += 3;
+            } else {
+              totalMarks -= 1;
+            }
+          }
+        });
+      }
+    });
+
+    global.resultjs.push({ RollNo: row.RollNo, TotalMarks: totalMarks });
+  });
+
+  // console.log(resultjs);
+  displayJSON(global.resultjs, resultDiv);
+}
+
+function exportResult() {
+  var wb = Excel.utils.book_new();
+  wb.Props = {
+    Title: 'RESULT',
+    Subject: 'Test',
+    Author: 'Sajjad Afzal',
+    Manager: 'Zaheen Muhammad',
+    CreatedDate: new Date()
+  };
+  wb.SheetNames.push('RESULT');
+  var ws = Excel.utils.json_to_sheet(global.resultjs);
+  wb.Sheets['RESULT'] = ws;
+  Excel.writeFile(wb, 'RESULT.xlsx');
+}
+
+function ReformatJSON(sourceJSON, noOfColShifts) {
   var colNames = Object.keys(sourceJSON[0]);
 
   // performs a circular shift on an array
@@ -34,20 +86,19 @@ function ReformatJSON(sourceJSON, noOfColShifts) {
     colNames.unshift(colNames.pop());
   }
 
-  dataText = JSON.stringify(sourceJSON, colNames);
+  var dataText = JSON.stringify(sourceJSON, colNames);
   return JSON.parse(dataText);
 }
 
 function displayJSON(jsonData, displayDiv) {
   var tbl = document.createElement('table');
+  var tr = document.createElement('tr'); // Header row
 
-  var tr = document.createElement('tr'); //Header row
+  tbl.className = 'table';
 
   Object.keys(jsonData[0]).forEach(hdr => {
     var th = document.createElement('th');
     th.innerHTML = hdr;
-    //th.style = 'font-weight: bold; font-style: italic; font-size: 30px;';
-    //console.log(c1);
     tr.append(th);
   });
 
@@ -63,29 +114,57 @@ function displayJSON(jsonData, displayDiv) {
     });
     tbl.append(rw);
   });
+
+  displayDiv.innerHTML = '';
   displayDiv.append(tbl);
 }
 
-const Handlers = {
-  BrowseFileEvent: () => {
-    //console.log(dialog);
-    dialog.showOpenDialog(
-      {
-        properties: ['openFile'],
-        filters: [
-          {
-            name: '',
-            extensions: ['xlsx', 'xls', 'xlsm'],
-          },
-        ],
-      },
-      files => {
-        if (files) {
-          event.sender.send('selected-directory', files);
+function openFileDialog(event) {
+  dialog.showOpenDialog(
+    {
+      properties: ['openFile'],
+      filters: [
+        {
+          name: '',
+          extensions: ['xlsx', 'xls', 'xlsm']
         }
+      ]
+    },
+    files => {
+      if (files) {
+        event.sender.send('selected-directory', files);
       }
-    );
-  },
-};
+    }
+  );
+}
 
-module.exports = { ReformatJSON, displayJSON, Handlers };
+module.exports = { ReformatJSON, displayJSON, readExcelToJSON, openFileDialog, exportResult, prepareResult, toggleView };
+
+// var dataText = '[ ';
+// var isFirst = true;
+
+// sourceJSON.forEach(r => {
+//   if (!isFirst) {
+//     dataText = dataText + ',';
+//   }
+//   isFirst = false;
+//   dataText = dataText + '{ "RollNo":';
+//   dataText = dataText + r.RollNo;
+//   dataText = dataText + ', "POST":';
+//   dataText = dataText + r.POST;
+//   dataText = dataText + ', "CENTER":';
+//   dataText = dataText + r.CENTER;
+//   dataText = dataText + ', "TIME":';
+//   dataText = dataText + r.TIME;
+//   var colNames = Object.keys(r);
+//   colNames.forEach(colName => {
+//     if ((colName[0] = 'Q')) {
+//       dataText = dataText + ',"' + colName + '":';
+//       dataText = dataText + '"' + r[colName] + '"';
+//     }
+//   });
+//   dataText = dataText + '}';
+// });
+// dataText = dataText + ']';
+// console.log(dataText);
+// return JSON.parse(dataText);

@@ -1,0 +1,10 @@
+{
+    "extends": "standard",
+    "rules": {
+        "space-before-function-paren": "off",
+        "semi": [
+            2,
+            "always"
+        ]
+    }
+}

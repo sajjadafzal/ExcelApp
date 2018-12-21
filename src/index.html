@@ -1,35 +1,31 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <!-- <link rel="stylesheet" href="css/bootstrap.css"> -->
-    <link rel="stylesheet" href="css/styles.css?v=1.0" />
-    <title>Hello World!</title>
-  </head>
 
-  <body>
-    <button id="browseFile" type="button" class="">Primary</button> Data:
-    <input
-      type="radio"
-      id="toggleView"
-      name="toggleView"
-      value="Data"
-      checked
-    />
-    Key:
-    <input type="radio" id="toggleView" name="toggleView" value="key" /> Result:
-    <input type="radio" id="toggleView" name="toggleView" value="result" />
-    <button id="btn_Result" type="button" class="">Calculate Result</button>
-    <button id="btn_Export" type="button" class="">Export Result</button>
-    <div id="DataSpace" class=""></div>
-    <div id="KeySpace" class="" style="display: none"></div>
-    <div id="ResultSpace" class="" style="display: none"></div>
+<head>
+  <meta charset="UTF-8" />
+  <link rel="stylesheet" href="css/bootstrap.css">
+  <link rel="stylesheet" href="css/styles.css?v=1.0" />
+  <title>Hello World!</title>
+</head>
 
-    <!-- <script src="js/bootstrap.bundle.js"></script> -->
+<body>
+  <button id="browseFile" type="button" class="btn btn-primary">Open Data File</button> Data:
+  <input type="radio" id="toggleView" name="toggleView" value="Data" checked />
+  Key:
+  <input type="radio" id="toggleView" name="toggleView" value="key" /> Result:
+  <input type="radio" id="toggleView" name="toggleView" value="result" />
+  <button id="btn_Result" type="button" class="btn btn-primary">Calculate</button>
+  <button id="btn_Export" type="button" class="btn btn-primary">Export</button>
+  <div id="DataSpace" class=""></div>
+  <div id="KeySpace" class="" style="display: none"></div>
+  <div id="ResultSpace" class="" style="display: none"></div>
 
-    <script>
-      // You can also require other files to run in this process
-      require('./renderer.js');
-    </script>
-  </body>
+  <!-- <script src="js/bootstrap.bundle.js"></script> -->
+
+  <script>
+    // You can also require other files to run in this process
+    require('./renderer.js');
+  </script>
+</body>
+
 </html>
