@@ -28,6 +28,13 @@ function readExcelToJSON(path) {
     workbook.Sheets[workbook.SheetNames[0]]
   );
 
+  datajs.forEach(row => {
+    var colNames = Object.keys(row);
+    colNames.forEach(col => {
+      row[col] = { value: row[col], color: '#AA0000' };
+    });
+  });
+  console.log(datajs);
   return datajs;
 }
 
@@ -37,7 +44,6 @@ function prepareResult() {
   // read data file
   const datajs = ReformatJSON(readExcelToJSON('DataFile.xls'), 4);
   const keyjs = ReformatJSON(readExcelToJSON('KEY.xls'), 3);
-
   var totalMarks = 0;
 
   datajs.forEach(row => {
@@ -100,8 +106,9 @@ function ReformatJSON(sourceJSON, noOfColShifts) {
   while (noOfColShifts--) {
     colNames.unshift(colNames.pop());
   }
-
+  console.log(colNames);
   var dataText = JSON.stringify(sourceJSON, colNames);
+  // console.log(dataText);
   return JSON.parse(dataText);
 }
 
@@ -118,13 +125,14 @@ function displayJSON(jsonData, displayDiv) {
   });
 
   tbl.append(tr);
-
+  console.log(jsonData);
   // Getting data values
   jsonData.forEach(row => {
     var rw = document.createElement('tr');
     Object.values(row).forEach(ent => {
+      // console.log(ent);
       var cl = document.createElement('td');
-      cl.innerHTML = ent;
+      cl.innerHTML = ent.value;
       rw.append(cl);
     });
     tbl.append(rw);

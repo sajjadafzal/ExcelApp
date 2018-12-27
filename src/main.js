@@ -16,7 +16,7 @@ function createWindow() {
 
   // and load the index.html of the app.
   // mainWindow.loadFile('index.html');
-  mainWindow.webContents.openDevTools();
+  // mainWindow.webContents.openDevTools();
   mainWindow.loadURL(`file://${__dirname}/index.html`);
   // mainWindow.loadURL('http://127.0.0.1:5500/');
 
