@@ -12,9 +12,11 @@
 }
 */
 
+
 button {
   margin: 5px;
 }
+
 
 
 table {
@@ -28,3 +30,5 @@ th, td {
   min-width: 35px;
   text-align: center;
 }
+
+

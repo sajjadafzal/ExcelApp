@@ -6,20 +6,27 @@ const { ipcRenderer } = require('electron');
 require('./handlers');
 
 global.resultjs = [];
+global.datajs = [];
+global.keyjs = [];
 
 // read data file
 
 const { dataDiv, keyDiv } = require('./uielements');
-const { ReformatJSON, displayJSON, readExcelToJSON } = require('./utilities');
+const { ReformatJSON, displayJSON, readExcelToJSON, AddColor } = require('./utilities');
 
 const datajs = readExcelToJSON('DataFile.xls');
 const keyjs = readExcelToJSON('KEY.xls');
-console.log(datajs);
+
+// console.log(JSON.stringify([{ 'Q1': { 'value': 'T' }, 'Q2': 'B', 'Q3': 'C' }, { 'Q1': 'D', 'Q2': 'E', 'Q3': 'F' }], ['Q1', 'Q2']));
+
+// console.og(datajs);
 // TESTING NEW JSON
-const newJSONData = ReformatJSON(datajs, 4);
-const newJSONKey = ReformatJSON(keyjs, 3);
+const newJSONData = AddColor(ReformatJSON(datajs, 4), 5);
 // console.log(newJSONData);
-displayJSON(newJSONData, dataDiv);
+const newJSONKey = AddColor(ReformatJSON(keyjs, 3));
+global.datajs = newJSONData;
+global.keyjs = newJSONKey;
+displayJSON(global.datajs, dataDiv);
 displayJSON(newJSONKey, keyDiv);
 
 // recieve event from file menu

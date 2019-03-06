@@ -4,6 +4,12 @@ const { remote } = require('electron');
 const { dataDiv, keyDiv, resultDiv } = require('./uielements');
 const { dialog } = remote;
 
+global.myColors = {
+  Red: '#ff9999',
+  Green: '#b3ff99',
+  Yellow: '#ffff80',
+  White: '#ffffff'
+};
 function toggleView(event) {
   const view = event.target.value;
 
@@ -28,59 +34,67 @@ function readExcelToJSON(path) {
     workbook.Sheets[workbook.SheetNames[0]]
   );
 
-  datajs.forEach(row => {
-    var colNames = Object.keys(row);
-    colNames.forEach(col => {
-      row[col] = { value: row[col], color: '#AA0000' };
-    });
-  });
-  console.log(datajs);
   return datajs;
 }
 
+function AddColor(sJSON) {
+  const datajs = sJSON;
+
+  datajs.forEach(row => {
+    var colNames = Object.keys(row);
+    colNames.forEach(col => {
+      row[col] = { value: row[col], color: global.myColors.White };
+    });
+  });
+  return datajs;
+}
 function prepareResult() {
   global.resultjs = [];
 
   // read data file
-  const datajs = ReformatJSON(readExcelToJSON('DataFile.xls'), 4);
-  const keyjs = ReformatJSON(readExcelToJSON('KEY.xls'), 3);
   var totalMarks = 0;
 
-  datajs.forEach(row => {
-    var colNames = Object.keys(row);
+  global.datajs.forEach((row, indx) => {
+    var scolor = global.myColors.White;
+    var colNames = Object.keys(row).filter(cN => { return cN[0] === 'Q'; });
     var marksObtained = 0;
 
     var correct = 0;
     var inCorrect = 0;
     var percentage = 0;
     var nonAttempt = 0;
-
-    keyjs.forEach(keyRow => {
-      if (keyRow.POST === row.POST) {
+    global.keyjs.forEach(keyRow => {
+      if (keyRow.POST.value === row.POST.value) {
         colNames.forEach(colName => {
-          if (keyRow[colName] !== '*' || keyRow[colName] !== '?') {
+          if (keyRow[colName] !== undefined && (keyRow[colName].value !== '*' && keyRow[colName].value !== '?')) {
             if (colName[0] === 'Q') {
-              if (row[colName] === '?') {
+              if (row[colName].value === '?') {
+                scolor = global.myColors.White;
                 nonAttempt++;
               } else {
-                if (row[colName] === keyRow[colName]) {
+                if (row[colName].value === keyRow[colName].value) {
                   marksObtained += 3;
+                  scolor = global.myColors.Green;
                   correct++;
                 } else {
                   marksObtained -= 1;
+                  scolor = global.myColors.Red;
                   inCorrect++;
                 }
               }
             }
+          } else {
+            scolor = global.myColors.Yellow;
           }
+          global.datajs[indx][colName].color = scolor;
         });
       }
     });
-
-    global.resultjs.push({ RollNo: row.RollNo, 'Total Marks Obtained': marksObtained, Correct: correct, 'In Correct': inCorrect, 'Un Attempted': nonAttempt });
+    global.resultjs.push({ RollNo: row.RollNo, 'Total Marks Obtained': { value: marksObtained, color: global.myColors.White }, Correct: { value: correct, color: global.myColors.White }, 'In Correct': { value: inCorrect, color: global.myColors.White }, 'Un Attempted': { value: nonAttempt, color: global.myColors.White } });
   });
 
   // console.log(resultjs);
+  displayJSON(global.datajs, dataDiv);
   displayJSON(global.resultjs, resultDiv);
 }
 
@@ -106,7 +120,7 @@ function ReformatJSON(sourceJSON, noOfColShifts) {
   while (noOfColShifts--) {
     colNames.unshift(colNames.pop());
   }
-  console.log(colNames);
+
   var dataText = JSON.stringify(sourceJSON, colNames);
   // console.log(dataText);
   return JSON.parse(dataText);
@@ -116,16 +130,18 @@ function displayJSON(jsonData, displayDiv) {
   var tbl = document.createElement('table');
   var tr = document.createElement('tr'); // Header row
 
-  // tbl.className = 'table-bordered';
+  tbl.className = 'fixed_headers';
 
   Object.keys(jsonData[0]).forEach(hdr => {
     var th = document.createElement('th');
     th.innerHTML = hdr;
     tr.append(th);
   });
-
-  tbl.append(tr);
-  console.log(jsonData);
+  var tblHead = document.createElement('thead');
+  // tblHead.style.position = 'fixed';
+  var tblBody = document.createElement('tbody');
+  tblHead.append(tr);
+  tbl.append(tblHead);
   // Getting data values
   jsonData.forEach(row => {
     var rw = document.createElement('tr');
@@ -133,11 +149,12 @@ function displayJSON(jsonData, displayDiv) {
       // console.log(ent);
       var cl = document.createElement('td');
       cl.innerHTML = ent.value;
+      cl.style.backgroundColor = ent.color;
       rw.append(cl);
     });
-    tbl.append(rw);
+    tblBody.append(rw);
   });
-
+  tbl.append(tblBody);
   displayDiv.innerHTML = '';
   displayDiv.append(tbl);
 }
@@ -161,7 +178,7 @@ function openFileDialog(event) {
   );
 }
 
-module.exports = { ReformatJSON, displayJSON, readExcelToJSON, openFileDialog, exportResult, prepareResult, toggleView };
+module.exports = { ReformatJSON, displayJSON, readExcelToJSON, AddColor, openFileDialog, exportResult, prepareResult, toggleView };
 
 // var dataText = '[ ';
 // var isFirst = true;
@@ -171,9 +188,8 @@ module.exports = { ReformatJSON, displayJSON, readExcelToJSON, openFileDialog, e
 //     dataText = dataText + ',';
 //   }
 //   isFirst = false;
-//   dataText = dataText + '{ "RollNo":';
-//   dataText = dataText + r.RollNo;
-//   dataText = dataText + ', "POST":';
+//   dataText = dataText + '{ "RollNo": {"value" : '+ r.RollNo  + '"color" : "#AA0000" }'; '
+//   dataText = dataText + ', "POST": {"value" : '+  r.POST + '"color" : "#AA0000" }'; '
 //   dataText = dataText + r.POST;
 //   dataText = dataText + ', "CENTER":';
 //   dataText = dataText + r.CENTER;
