@@ -27,7 +27,7 @@
     "eslint-plugin-node": "^8.0.0",
     "eslint-plugin-promise": "^4.0.1",
     "eslint-plugin-standard": "^4.0.0",
-    "xlsx": "^0.14.1"
+    "xlsx": "^0.17.0"
   },
   "bugs": {
     "url": "https://github.com/electron/electron-quick-start/issues"
